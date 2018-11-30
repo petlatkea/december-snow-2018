@@ -1,0 +1,23 @@
+
+body {
+  margin: 0;
+}
+
+#nightsky {
+  background: linear-gradient(to bottom, #000000 0%,#124ded 96%,#527dea 100%);
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+.snowflake {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 100%;
+  left: 100px;
+  top: 100px;
+
+  box-shadow: 0px 0px 15px white;
+}
