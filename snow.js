@@ -3,11 +3,13 @@ let ypos = 0;
 
 function init() {
   let flakes = document.querySelectorAll(".snowflake");
-  flakes[0].style.left = "50px";
-  flakes[1].style.left = "100px";
-  flakes[2].style.left = "150px";
-  flakes[3].style.left = "200px";
-  flakes[4].style.left = "250px";
+
+  let start = 25;
+  let increment = 50;
+  for( let i = 0; i < flakes.length; i++ ) {
+    let value = start + increment*i;
+    flakes[i].style.left = value + "px";
+  }
 
   // start moving snowflakes
   move();
@@ -19,13 +21,11 @@ function reset(){
 
 function move() {
   let flakes = document.querySelectorAll(".snowflake");
-  flakes[0].style.top = ypos + "px";
-  flakes[1].style.top = ypos + "px";
-  flakes[2].style.top = ypos + "px";
-  flakes[3].style.top = ypos + "px";
-  flakes[4].style.top = ypos + "px";
 
-//  document.querySelector(".snowflake").style.top = ypos + "px";
+  for( let i = 0; i < flakes.length; i++ ) {
+    flakes[i].style.top = ypos + "px";
+  }
+
   ypos++;
 
   let max = document.querySelector("#nightsky").clientHeight;
