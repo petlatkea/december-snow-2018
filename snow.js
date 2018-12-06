@@ -10,8 +10,8 @@ function init() {
   for( let i = 0; i < flakes.length; i++ ) {
     let value = start + increment*i;
     flakes[i].style.left = value + "px";
-    ypos[i] = Math.random()*100;
-    speed[i] = Math.random()*10;
+
+    reset(i);
   }
 
   // start moving snowflakes
@@ -20,7 +20,9 @@ function init() {
 
 function reset(i){
   ypos[i] = -10;
-  speed[i] = Math.random()*10;
+  let min = 0.17;
+  let max = 10;
+  speed[i] = Math.random()*(max-min)+min;
   flakes[i].style.transform = "scale("+Math.random()+")";
 }
 
