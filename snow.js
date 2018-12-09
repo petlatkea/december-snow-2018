@@ -25,20 +25,25 @@ function init() {
 function reset(i){
   xpos[i] = Math.random() * maxX;
   ypos[i] = -10;
-  let min = 0.17;
-  let maxSpeed = 10;
+  let min = 10;
+  let maxSpeed = 100;
   speed[i] = Math.random()*(maxSpeed-min)+min;
   flakes[i].style.transform = "scale("+Math.random()+")";
 }
 
-function move() {
+let last;
 
+function move() {
+  let now = Date.now() /1000;
+  let delta = now - (last || 0);
+
+ // console.log(delta);
   for( let i = 0; i < flakes.length; i++ ) {
     flakes[i].style.top = ypos[i] + "px";
     flakes[i].style.left = xpos[i] + "px";
 
 //    flakes[i].style.transform ="translate("+xpos[i]+"px, "+ypos[i]+"px)";
-    ypos[i]+= speed[i];
+    ypos[i]+= speed[i] * delta;
 
 
     if( ypos[i] > maxY ) {
@@ -46,6 +51,7 @@ function move() {
     }
   }
 
+  last = now;
 
   requestAnimationFrame( move );
 }
