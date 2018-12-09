@@ -35,7 +35,7 @@ let last;
 
 function move() {
   let now = Date.now() /1000;
-  let delta = now - (last || 0);
+  let delta = now - (last || now);
 
  // console.log(delta);
   for( let i = 0; i < flakes.length; i++ ) {
