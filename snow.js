@@ -1,34 +1,48 @@
 
-let ypos = [];
-let xpos = [];
-let speed = [];
-let flakes = document.querySelectorAll(".snowflake");
-let maxX = document.querySelector("#nightsky").clientWidth;
-let maxY = document.querySelector("#nightsky").clientHeight;
+
+
+
+const SnowFlake = {
+  ypos: 0,
+  xpos: 0,
+  speed: 0,
+  element: null
+};
+
+const config = {
+  maxX: document.querySelector("#nightsky").clientWidth,
+  maxY: document.querySelector("#nightsky").clientHeight,
+  minSpeed: 10,
+  maxSpeed: 100
+};
+
+let snowflakes = [];
 
 function init() {
 
-  let start = 25;
-  let increment = 50;
-  for( let i = 0; i < flakes.length; i++ ) {
-//    let max = document.querySelector("#nightsky").clientWidth;
-//    let value = Math.random() * max;
-//    flakes[i].style.left = value + "px";
-
-    reset(i);
+  // go over all div elements in the HTML
+  let elements = document.querySelectorAll(".snowflake");
+  for( let i = 0; i < elements.length; i++ ) {
+    // create a snowflake object
+    let flake = Object.create(SnowFlake);
+    // connect it to the HTML element
+    flake.element = elements[i];
+    // reset all the properties
+    reset(flake);
+    // store it in my array
+    snowflakes.push(flake);
   }
 
   // start moving snowflakes
   move();
 }
 
-function reset(i){
-  xpos[i] = Math.random() * maxX;
-  ypos[i] = -10;
-  let min = 10;
-  let maxSpeed = 100;
-  speed[i] = Math.random()*(maxSpeed-min)+min;
-  flakes[i].style.transform = "scale("+Math.random()+")";
+function reset(flake){
+  flake.xpos = Math.random() * config.maxX;
+  flake.ypos = -10;
+
+  flake.speed = Math.random()*(config.maxSpeed-config.minSpeed)+config.minSpeed;
+  flake.element.style.transform = "scale("+Math.random()+")";
 }
 
 let last;
@@ -38,16 +52,17 @@ function move() {
   let delta = now - (last || now);
 
  // console.log(delta);
-  for( let i = 0; i < flakes.length; i++ ) {
-    flakes[i].style.top = ypos[i] + "px";
-    flakes[i].style.left = xpos[i] + "px";
+  for( let i = 0; i < snowflakes.length; i++ ) {
+    let flake = snowflakes[i];
+    flake.element.style.top = flake.ypos + "px";
+    flake.element.style.left = flake.xpos + "px";
 
 //    flakes[i].style.transform ="translate("+xpos[i]+"px, "+ypos[i]+"px)";
-    ypos[i]+= speed[i] * delta;
+    flake.ypos += flake.speed * delta;
 
 
-    if( ypos[i] > maxY ) {
-      reset(i);
+    if( flake.ypos > config.maxY ) {
+      reset(flake);
     }
   }
 
