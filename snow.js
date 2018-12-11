@@ -1,3 +1,10 @@
+const config = {
+  maxX: document.querySelector("#nightsky").clientWidth,
+  maxY: document.querySelector("#nightsky").clientHeight,
+  minSpeed: 10,
+  maxSpeed: 100,
+  windSpeed: 50
+};
 
 
 
@@ -6,14 +13,29 @@ const SnowFlake = {
   ypos: 0,
   xpos: 0,
   speed: 0,
-  element: null
-};
+  element: null,
+  reset() {
+    this.xpos = Math.random() * config.maxX;
+    this.ypos = -10;
 
-const config = {
-  maxX: document.querySelector("#nightsky").clientWidth,
-  maxY: document.querySelector("#nightsky").clientHeight,
-  minSpeed: 10,
-  maxSpeed: 100
+    this.speed = Math.random()*(config.maxSpeed-config.minSpeed)+config.minSpeed;
+    this.element.style.transform = "scale("+Math.random()+")";
+  },
+  show() {
+    this.element.style.top = this.ypos + "px";
+    this.element.style.left = this.xpos + "px";
+  },
+  move(delta) {
+    this.ypos += this.speed * delta;
+    this.xpos += config.windSpeed * delta;
+    if( this.xpos > config.maxX ) {
+      this.xpos = 0;
+    }
+
+    if( this.ypos > config.maxY ) {
+      this.reset();
+    }
+  }
 };
 
 let snowflakes = [];
@@ -28,47 +50,39 @@ function init() {
     // connect it to the HTML element
     flake.element = elements[i];
     // reset all the properties
-    reset(flake);
+    flake.reset();
+
     // store it in my array
     snowflakes.push(flake);
   }
 
   // start moving snowflakes
-  move();
+  animate();
 }
 
-function reset(flake){
-  flake.xpos = Math.random() * config.maxX;
-  flake.ypos = -10;
-
-  flake.speed = Math.random()*(config.maxSpeed-config.minSpeed)+config.minSpeed;
-  flake.element.style.transform = "scale("+Math.random()+")";
-}
 
 let last;
 
-function move() {
+
+
+
+
+function animate() {
   let now = Date.now() /1000;
   let delta = now - (last || now);
 
  // console.log(delta);
   for( let i = 0; i < snowflakes.length; i++ ) {
     let flake = snowflakes[i];
-    flake.element.style.top = flake.ypos + "px";
-    flake.element.style.left = flake.xpos + "px";
+    flake.show();
 
 //    flakes[i].style.transform ="translate("+xpos[i]+"px, "+ypos[i]+"px)";
-    flake.ypos += flake.speed * delta;
-
-
-    if( flake.ypos > config.maxY ) {
-      reset(flake);
-    }
+    flake.move(delta);
   }
 
   last = now;
 
-  requestAnimationFrame( move );
+  requestAnimationFrame( animate );
 }
 
 init();
