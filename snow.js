@@ -14,12 +14,19 @@ const SnowFlake = {
   xpos: 0,
   speed: 0,
   element: null,
+  create() {
+    let div = document.createElement("div");
+    div.classList.add("snowflake");
+    document.querySelector("#nightsky").appendChild(div);
+    this.element = div;
+  },
   reset() {
     this.xpos = Math.random() * config.maxX;
     this.ypos = -10;
 
     this.speed = Math.random()*(config.maxSpeed-config.minSpeed)+config.minSpeed;
     this.element.style.transform = "scale("+Math.random()+")";
+    this.weight = Math.random();
   },
   show() {
     this.element.style.top = this.ypos + "px";
@@ -27,7 +34,7 @@ const SnowFlake = {
   },
   move(delta) {
     this.ypos += this.speed * delta;
-    this.xpos += config.windSpeed * delta;
+    this.xpos += config.windSpeed *this.weight * delta;
     if( this.xpos > config.maxX ) {
       this.xpos = 0;
     }
@@ -43,12 +50,14 @@ let snowflakes = [];
 function init() {
 
   // go over all div elements in the HTML
-  let elements = document.querySelectorAll(".snowflake");
-  for( let i = 0; i < elements.length; i++ ) {
+  //let elements = document.querySelectorAll(".snowflake");
+
+  for( let i = 0; i < 1000; i++ ) {
     // create a snowflake object
     let flake = Object.create(SnowFlake);
-    // connect it to the HTML element
-    flake.element = elements[i];
+    // create a HTML element
+    flake.create();
+
     // reset all the properties
     flake.reset();
 
