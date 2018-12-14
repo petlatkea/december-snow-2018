@@ -48,12 +48,16 @@ const SnowFlake = {
       let height = landed[index];
 
       if( this.ypos > config.maxY - height - 10*this.size ) {
-        //this.reset();
-        // stop this snowflake
-        this.stopped = true;
-        landed[index] += 10*this.size;
 
-        newSnowFlake();
+        // land the snowflake
+        landSnowflake(this);
+
+        // then reset the flake
+        this.reset();
+        // stop this snowflake
+//        this.stopped = true;
+//        landed[index] += 10*this.size;
+//        newSnowFlake();
       }
     }
   }
@@ -74,6 +78,13 @@ function newSnowFlake() {
   snowflakes.push(flake);
 }
 
+function landSnowflake( flake ) {
+  // TODO: get xpos and ypos from flake!
+  const ctx = config.ctx;
+  ctx.fillStyle = 'orange';
+  ctx.fillRect(flake.xpos, flake.ypos, 2, 2);
+}
+
 function init() {
 
   // go over all div elements in the HTML
@@ -88,6 +99,17 @@ function init() {
   for( let x=0; x < config.maxX; x++ ) {
     landed[x] =0;
   }
+
+  // find the canvas
+  const canvas = document.getElementById('canvas');
+  canvas.width = config.maxX;
+  canvas.height = config.maxY;
+const ctx = canvas.getContext('2d');
+  config.ctx = ctx;
+
+
+  // do something with it ...
+
 
   // start moving snowflakes
   animate();

@@ -19,7 +19,7 @@ Every tag represents an episode:
 13. Methods - *Add methods to objects*
 14. Create - *Create snowflakes automatically*
 15. Landing - *Snowflakes lands, and new ones are created*
-16. .
+16. Canvas - *Snowflakes lands on canvas, rather than as divs*
 17. .
 18. .
 19. .
