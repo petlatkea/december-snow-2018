@@ -47,7 +47,7 @@ const SnowFlake = {
       let index = Math.floor(this.xpos);
       let height = landed[index];
 
-      if( this.ypos > config.maxY - height - 10*this.size ) {
+      if( this.ypos >= config.maxY - height ) {
 
         // land the snowflake
         landSnowflake(this);
@@ -80,9 +80,14 @@ function newSnowFlake() {
 
 function landSnowflake( flake ) {
   // TODO: get xpos and ypos from flake!
+  let x = Math.floor(flake.xpos);
+  let y = config.maxY-1 - landed[x];
+
+  landed[x]++;
+
   const ctx = config.ctx;
-  ctx.fillStyle = 'orange';
-  ctx.fillRect(flake.xpos, flake.ypos, 2, 2);
+  ctx.fillStyle = 'white';
+  ctx.fillRect(x, y, 2, 2);
 }
 
 function init() {

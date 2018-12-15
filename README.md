@@ -20,7 +20,7 @@ Every tag represents an episode:
 14. Create - *Create snowflakes automatically*
 15. Landing - *Snowflakes lands, and new ones are created*
 16. Canvas - *Snowflakes lands on canvas, rather than as divs*
-17. .
+17. Dunes - *Snowflakes lands on canvas, and builds dunes*
 18. .
 19. .
 20. .
