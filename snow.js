@@ -30,6 +30,10 @@ const SnowFlake = {
     this.element.style.transform = "scale("+this.size+")";
     this.weight = Math.random();
     this.stopped = false;
+
+    // give it a random z-index from 0 - 4
+    this.element.style.zIndex = Math.floor(Math.random()*4);
+
   },
   show() {
     this.element.style.top = this.ypos + "px";
@@ -109,11 +113,16 @@ function init() {
   const canvas = document.getElementById('canvas');
   canvas.width = config.maxX;
   canvas.height = config.maxY;
-const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext('2d');
   config.ctx = ctx;
 
 
-  // do something with it ...
+  // draw text
+  ctx.font = '148px serif';
+  ctx.fillStyle = "red";
+  ctx.textBaseline = "top";
+  ctx.textAlign = "center";
+  ctx.fillText('Merry Jul', config.maxX/2, 100);
 
 
   // start moving snowflakes
