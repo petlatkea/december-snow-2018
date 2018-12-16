@@ -21,7 +21,7 @@ Every tag represents an episode:
 15. Landing - *Snowflakes lands, and new ones are created*
 16. Canvas - *Snowflakes lands on canvas, rather than as divs*
 17. Dunes - *Snowflakes lands on canvas, and builds dunes*
-18. .
+18. No-spikes - *Snowflakes lands perfectly, no-spikes*
 19. .
 20. .
 21. .

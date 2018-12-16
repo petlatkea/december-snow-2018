@@ -81,13 +81,13 @@ function newSnowFlake() {
 function landSnowflake( flake ) {
   // TODO: get xpos and ypos from flake!
   let x = Math.floor(flake.xpos);
-  let y = config.maxY-1 - landed[x];
+  let y = config.maxY - landed[x];
 
   landed[x]++;
 
   const ctx = config.ctx;
   ctx.fillStyle = 'white';
-  ctx.fillRect(x, y, 2, 2);
+  ctx.fillRect(x, y, 1, 1);
 }
 
 function init() {
@@ -140,6 +140,32 @@ function animate() {
     flake.move(delta);
   }
 
+  // avoid the spikes
+  for( let x= 0; x < landed.length; x++ ) {
+    let thisheight = landed[x];
+    let nextheight = landed[x+1];
+
+    // if this is to much taller than next, move snowflake to the next
+    if( thisheight-2 > nextheight ) {
+      // remove a pixel
+      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
+      landed[x]--;
+
+      config.ctx.fillRect(x+1, config.maxY-landed[x+1],1,1);
+      landed[x+1]++;
+    }
+
+    if( x > 0 && thisheight-1 > landed[x-1] ) {
+      // remove a pixel here
+      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
+      landed[x]--;
+
+      // add a pixel to the left
+      config.ctx.fillRect(x-1, config.maxY-landed[x-1],1,1);
+      landed[x-1]++;
+
+    }
+  }
   last = now;
 
   requestAnimationFrame( animate );
