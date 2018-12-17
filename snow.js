@@ -51,6 +51,20 @@ const SnowFlake = {
       let index = Math.floor(this.xpos);
       let height = landed[index];
 
+      // check if landed on a letterTop
+      let y = Math.floor(this.ypos);
+      if( y == letterTops[index] ) {
+        // land on letter!
+
+
+
+  //landed[x]++;
+
+          const ctx = config.ctx;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(index, y, 1, 1);
+      }
+
       if( this.ypos >= config.maxY - height ) {
 
         // land the snowflake
@@ -124,12 +138,42 @@ function init() {
   ctx.textAlign = "center";
   ctx.fillText('Merry Jul', config.maxX/2, 100);
 
+  // analyze the image
+  let myImageData = ctx.getImageData(0, 0, config.maxX, config.maxY);
+
+
+
+  // loop throug every x value
+  for( let x=0; x < myImageData.width; x++ ) {
+
+    letterTops[x] = config.maxY;
+    // loop through y value on this X
+    for( let y=0; y < myImageData.height; y++ ) {
+
+      let index = 4*(y*myImageData.width+x);
+
+      let r= myImageData.data[index];
+      let g= myImageData.data[index+1];
+      let b= myImageData.data[index+2];
+      let a= myImageData.data[index+3];
+
+      if( a != 0 ) {
+        // non-transparent pixel at position x,y
+        letterTops[x] = y;
+        break;
+
+      }
+
+     // console.log("for x,y (%d,%d), a is: %d", x,y,a);
+    }
+
+  }
 
   // start moving snowflakes
   animate();
 }
 
-
+let letterTops = [];
 let last;
 
 

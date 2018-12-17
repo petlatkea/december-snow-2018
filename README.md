@@ -23,7 +23,7 @@ Every tag represents an episode:
 17. Dunes - *Snowflakes lands on canvas, and builds dunes*
 18. No-spikes - *Snowflakes lands perfectly, no-spikes*
 19. Text - *Adding a text-greeting to the screen*
-20. .
+20. Snowy letters - *Snow landing on top of letters*
 21. .
 22. .
 23. .
