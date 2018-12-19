@@ -48,35 +48,52 @@ const SnowFlake = {
       }
 
       // find the xindex
-      let index = Math.floor(this.xpos);
-      let height = landed[index];
-
-      // check if landed on a letterTop
+      let x = Math.floor(this.xpos);
       let y = Math.floor(this.ypos);
-      if( y == letterTops[index] ) {
-        // land on letter!
 
+//      let height = landed[index];
 
+      // check if landed on a platform
+      let platforms = allPlatforms[x];
+      let lowest = platforms[platforms.length-1];
+      // loop through them, check if snowflake hits one of them
+      for( let i=0; i < platforms.length; i++ ) {
+        let platform = platforms[i];
 
-  //landed[x]++;
-
-          const ctx = config.ctx;
-        ctx.fillStyle = 'white';
-        ctx.fillRect(index, y, 1, 1);
+        // if y == this platform - then land snowflake
+        if( y === platform || (platform === lowest && y >= platform) ) {
+          landSnowflake( this, platform );
+          this.reset();
+          break;
+        }
       }
 
-      if( this.ypos >= config.maxY - height ) {
 
-        // land the snowflake
-        landSnowflake(this);
+//
+//      if( y == letterTops[index] ) {
+//        // land on letter!
+//
+//
+//
+//  //landed[x]++;
+//
+//          const ctx = config.ctx;
+//        ctx.fillStyle = 'white';
+//        ctx.fillRect(index, y, 1, 1);
+//      }
 
-        // then reset the flake
-        this.reset();
-        // stop this snowflake
-//        this.stopped = true;
-//        landed[index] += 10*this.size;
-//        newSnowFlake();
-      }
+//      if( this.ypos >= config.maxY - height ) {
+//
+//        // land the snowflake
+//        landSnowflake(this);
+//
+//        // then reset the flake
+//        this.reset();
+//        // stop this snowflake
+////        this.stopped = true;
+////        landed[index] += 10*this.size;
+////        newSnowFlake();
+//      }
     }
   }
 };
@@ -96,12 +113,11 @@ function newSnowFlake() {
   snowflakes.push(flake);
 }
 
-function landSnowflake( flake ) {
-  // TODO: get xpos and ypos from flake!
+function landSnowflake( flake, platform ) {
   let x = Math.floor(flake.xpos);
-  let y = config.maxY - landed[x];
+  let y = platform;
 
-  landed[x]++;
+//  landed[x]++;
 
   const ctx = config.ctx;
   ctx.fillStyle = 'white';
@@ -145,8 +161,11 @@ function init() {
 
   // loop throug every x value
   for( let x=0; x < myImageData.width; x++ ) {
+    let platforms = [];
+    allPlatforms[x] = platforms;
 
-    letterTops[x] = config.maxY;
+//    letterTops[x] = config.maxY;
+    let inAPlatform = false;
     // loop through y value on this X
     for( let y=0; y < myImageData.height; y++ ) {
 
@@ -157,15 +176,25 @@ function init() {
       let b= myImageData.data[index+2];
       let a= myImageData.data[index+3];
 
-      if( a != 0 ) {
+      if( !inAPlatform && a > 50 ) {
         // non-transparent pixel at position x,y
-        letterTops[x] = y;
-        break;
 
+        // add a new platform!
+        platforms.push( y );
+
+//        letterTops[x] = y;
+        inAPlatform = true;
+
+      } else if( inAPlatform && a < 10 ) {
+        // transparent pixel!
+        inAPlatform = false;
       }
 
      // console.log("for x,y (%d,%d), a is: %d", x,y,a);
     }
+    // also push the maxY
+    platforms.push( config.maxY-1 );
+
 
   }
 
@@ -173,7 +202,8 @@ function init() {
   animate();
 }
 
-let letterTops = [];
+let allPlatforms = [];
+//let letterTops = [];
 let last;
 
 

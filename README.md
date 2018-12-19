@@ -24,7 +24,7 @@ Every tag represents an episode:
 18. No-spikes - *Snowflakes lands perfectly, no-spikes*
 19. Text - *Adding a text-greeting to the screen*
 20. Snowy letters - *Snow landing on top of letters*
-21. .
+21. Platforms - *Snow landing on top and on serifs of letters*
 22. .
 23. .
 24. .
