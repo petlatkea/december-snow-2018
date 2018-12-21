@@ -181,7 +181,7 @@ function init() {
         // non-transparent pixel at position x,y
 
         // add a new platform!
-        platforms.push( { base: y, height: 0 } );
+        platforms.push( {x:x, base: y, height: 0 } );
 
 //        letterTops[x] = y;
         inAPlatform = true;
@@ -194,9 +194,41 @@ function init() {
      // console.log("for x,y (%d,%d), a is: %d", x,y,a);
     }
     // also push the maxY
-    platforms.push( { base: config.maxY-1, height: 0 } );
+    platforms.push( {x:x, base: config.maxY-1, height: 0 } );
 
 
+  }
+
+  // find neighbouring platforms
+  for( let x=0; x < allPlatforms.length; x++ ) {
+    let platforms = allPlatforms[x];
+    for( let i=0; i <platforms.length; i++ ) {
+      let platform = platforms[i];
+
+      let smallestDistance = Number.MAX_SAFE_INTEGER;
+      let possibleNeighbours = allPlatforms[x+1];
+      let closestNeighbour = null;
+      if( possibleNeighbours ) {
+
+
+        for( let j=0; j < possibleNeighbours.length; j++) {
+          let neighbour = possibleNeighbours[j];
+          let dist = Math.abs(platform.base - neighbour.base);
+
+          // is smallest possible distance
+          if( dist < smallestDistance ) {
+            smallestDistance = dist;
+            closestNeighbour = neighbour;
+          }
+
+        }
+
+        if( smallestDistance < 10 ) {
+          platform.next = closestNeighbour;
+          closestNeighbour.prev = platform;
+        }
+      }
+    }
   }
 
   // start moving snowflakes
@@ -225,31 +257,61 @@ function animate() {
   }
 
   // avoid the spikes
-  for( let x= 0; x < landed.length; x++ ) {
-    let thisheight = landed[x];
-    let nextheight = landed[x+1];
+  for( let x=0; x < allPlatforms.length; x++ ) {
+    let platforms = allPlatforms[x];
+    for( let i=0; i < platforms.length; i++ ) {
+      let platform = platforms[i];
 
-    // if this is to much taller than next, move snowflake to the next
-    if( thisheight-2 > nextheight ) {
-      // remove a pixel
-      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
-      landed[x]--;
+      let next = platform.next;
+      let prev = platform.prev;
 
-      config.ctx.fillRect(x+1, config.maxY-landed[x+1],1,1);
-      landed[x+1]++;
+      if( platform.height > 2 ) {
+      if(next && platform.base-platform.height+2 < next.base-next.height ) {
+        // move a snowflake from platform to next
+        config.ctx.clearRect(x, platform.base-platform.height,1,1);
+        platform.height--;
+
+        config.ctx.fillRect(x+1, next.base-next.height,1,1);
+        next.height++;
+      }
+
+      if(prev && platform.base-platform.height+1 < prev.base-prev.height) {
+        // move a snowflake from platform to prev
+        config.ctx.clearRect(x, platform.base-platform.height,1,1);
+        platform.height--;
+
+        config.ctx.fillRect(x-1, prev.base-prev.height,1,1);
+        prev.height++;
+      }
+
     }
-
-    if( x > 0 && thisheight-1 > landed[x-1] ) {
-      // remove a pixel here
-      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
-      landed[x]--;
-
-      // add a pixel to the left
-      config.ctx.fillRect(x-1, config.maxY-landed[x-1],1,1);
-      landed[x-1]++;
-
     }
   }
+//  for( let x= 0; x < landed.length; x++ ) {
+//    let thisheight = landed[x];
+//    let nextheight = landed[x+1];
+//
+//    // if this is to much taller than next, move snowflake to the next
+//    if( thisheight-2 > nextheight ) {
+//      // remove a pixel
+//      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
+//      landed[x]--;
+//
+//      config.ctx.fillRect(x+1, config.maxY-landed[x+1],1,1);
+//      landed[x+1]++;
+//    }
+//
+//    if( x > 0 && thisheight-1 > landed[x-1] ) {
+//      // remove a pixel here
+//      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
+//      landed[x]--;
+//
+//      // add a pixel to the left
+//      config.ctx.fillRect(x-1, config.maxY-landed[x-1],1,1);
+//      landed[x-1]++;
+//
+//    }
+//  }
   last = now;
 
   requestAnimationFrame( animate );

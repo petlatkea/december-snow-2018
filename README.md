@@ -26,7 +26,7 @@ Every tag represents an episode:
 20. Snowy letters - *Snow landing on top of letters*
 21. Platforms - *Snow landing on top and on serifs of letters*
 22. Spikes on platforms - *Snow stacking on platforms, but with spikes*
-23. .
+23. Perfect platforms - *Snow landing on platforms without spikes*
 24. .
 
 
