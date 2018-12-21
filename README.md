@@ -25,7 +25,7 @@ Every tag represents an episode:
 19. Text - *Adding a text-greeting to the screen*
 20. Snowy letters - *Snow landing on top of letters*
 21. Platforms - *Snow landing on top and on serifs of letters*
-22. .
+22. Spikes on platforms - *Snow stacking on platforms, but with spikes*
 23. .
 24. .
 

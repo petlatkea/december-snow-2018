@@ -61,7 +61,7 @@ const SnowFlake = {
         let platform = platforms[i];
 
         // if y == this platform - then land snowflake
-        if( y === platform || (platform === lowest && y >= platform) ) {
+        if( y === platform.base-platform.height || (platform === lowest && y >= platform.base-platform.height) ) {
           landSnowflake( this, platform );
           this.reset();
           break;
@@ -115,9 +115,10 @@ function newSnowFlake() {
 
 function landSnowflake( flake, platform ) {
   let x = Math.floor(flake.xpos);
-  let y = platform;
+  let y = platform.base-platform.height;
 
 //  landed[x]++;
+  platform.height++;
 
   const ctx = config.ctx;
   ctx.fillStyle = 'white';
@@ -180,7 +181,7 @@ function init() {
         // non-transparent pixel at position x,y
 
         // add a new platform!
-        platforms.push( y );
+        platforms.push( { base: y, height: 0 } );
 
 //        letterTops[x] = y;
         inAPlatform = true;
@@ -193,7 +194,7 @@ function init() {
      // console.log("for x,y (%d,%d), a is: %d", x,y,a);
     }
     // also push the maxY
-    platforms.push( config.maxY-1 );
+    platforms.push( { base: config.maxY-1, height: 0 } );
 
 
   }
