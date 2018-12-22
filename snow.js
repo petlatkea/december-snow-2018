@@ -1,4 +1,6 @@
+// configuration object
 const config = {
+  ctx: null,
   maxX: document.querySelector("#nightsky").clientWidth,
   maxY: document.querySelector("#nightsky").clientHeight,
   minSpeed: 10,
@@ -6,9 +8,7 @@ const config = {
   windSpeed: 50
 };
 
-
-
-
+// Prototype SnowFlake
 const SnowFlake = {
   ypos: 0,
   xpos: 0,
@@ -16,306 +16,256 @@ const SnowFlake = {
   element: null,
   stopped: false,
   create() {
-    let div = document.createElement("div");
-    div.classList.add("snowflake");
-    document.querySelector("#nightsky").appendChild(div);
-    this.element = div;
+    // create div.snowflake and add it to the #nightsky
+    let element = document.createElement("div");
+    element.classList.add("snowflake");
+    document.querySelector("#nightsky").appendChild(element);
+    this.element = element;
+
+    this.reset();
   },
   reset() {
     this.xpos = Math.random() * config.maxX;
     this.ypos = -10;
 
-    this.speed = Math.random()*(config.maxSpeed-config.minSpeed)+config.minSpeed;
+    this.speed = Math.random() * (config.maxSpeed - config.minSpeed) + config.minSpeed;
     this.size = Math.random();
-    this.element.style.transform = "scale("+this.size+")";
     this.weight = Math.random();
     this.stopped = false;
 
     // give it a random z-index from 0 - 4
-    this.element.style.zIndex = Math.floor(Math.random()*4);
+    this.zIndex = Math.floor(Math.random() * 4);
 
+    // apply new styles.
+    this.element.style.zIndex = this.zIndex;
+    this.element.style.transform = "scale(" + this.size + ")";
   },
   show() {
     this.element.style.top = this.ypos + "px";
     this.element.style.left = this.xpos + "px";
   },
   move(delta) {
-    if( !this.stopped ) {
+    if (!this.stopped) {
       this.ypos += this.speed * delta;
-      this.xpos += config.windSpeed *this.weight * delta;
-      if( this.xpos > config.maxX ) {
-        this.xpos = 0;
+      this.xpos += config.windSpeed * this.weight * delta;
+      if (this.xpos > config.maxX) {
+        this.xpos = 0; // TODO: Check if this causes landing at position 0
       }
 
-      // find the xindex
+      // check if snowflake has landed
+      // find rounded x and y values
       let x = Math.floor(this.xpos);
       let y = Math.floor(this.ypos);
 
-//      let height = landed[index];
-
-      // check if landed on a platform
+      // check landing on each platform in this x
       let platforms = allPlatforms[x];
-      let lowest = platforms[platforms.length-1];
+      let lowest = platforms[platforms.length - 1];
       // loop through them, check if snowflake hits one of them
-      for( let i=0; i < platforms.length; i++ ) {
+      for (let i = 0; i < platforms.length; i++) {
         let platform = platforms[i];
 
         // if y == this platform - then land snowflake
-        if( y === platform.base-platform.height || (platform === lowest && y >= platform.base-platform.height) ) {
-          landSnowflake( this, platform );
+        if (
+          y === platform.base - platform.height ||
+          (platform === lowest && y >= platform.base - platform.height)
+        ) {
+          landSnowflake(this, platform);
           this.reset();
           break;
         }
       }
-
-
-//
-//      if( y == letterTops[index] ) {
-//        // land on letter!
-//
-//
-//
-//  //landed[x]++;
-//
-//          const ctx = config.ctx;
-//        ctx.fillStyle = 'white';
-//        ctx.fillRect(index, y, 1, 1);
-//      }
-
-//      if( this.ypos >= config.maxY - height ) {
-//
-//        // land the snowflake
-//        landSnowflake(this);
-//
-//        // then reset the flake
-//        this.reset();
-//        // stop this snowflake
-////        this.stopped = true;
-////        landed[index] += 10*this.size;
-////        newSnowFlake();
-//      }
     }
   }
 };
 
-let snowflakes = [];
-let landed = [];
+// array of all the snowflakes on the screen
+const snowflakes = [];
 
 function newSnowFlake() {
-  let flake = Object.create(SnowFlake);
-  // create a HTML element
+  const flake = Object.create(SnowFlake);
   flake.create();
 
-  // reset all the properties
-  flake.reset();
-
-  // store it in my array
+  // store it in the array
   snowflakes.push(flake);
 }
 
-function landSnowflake( flake, platform ) {
-  let x = Math.floor(flake.xpos);
-  let y = platform.base-platform.height;
+function landSnowflake(flake, platform) {
+  let x = platform.x;
+  let y = platform.base - platform.height;
 
-//  landed[x]++;
   platform.height++;
 
+  // draw landed snowflake as a pixel
   const ctx = config.ctx;
-  ctx.fillStyle = 'white';
+  ctx.fillStyle = "white";
   ctx.fillRect(x, y, 1, 1);
 }
 
-function init() {
-
-  // go over all div elements in the HTML
-  //let elements = document.querySelectorAll(".snowflake");
-
-  for( let i = 0; i < 1000; i++ ) {
-    // create a snowflake object
-    newSnowFlake();
-  }
-
-  // init landed array
-  for( let x=0; x < config.maxX; x++ ) {
-    landed[x] =0;
-  }
-
-  // find the canvas
-  const canvas = document.getElementById('canvas');
+function initCanvas() {
+  const canvas = document.getElementById("canvas");
   canvas.width = config.maxX;
   canvas.height = config.maxY;
-  const ctx = canvas.getContext('2d');
-  config.ctx = ctx;
 
+  // remember the context
+  config.ctx = canvas.getContext("2d");
+}
 
-  // draw text
-  ctx.font = '148px serif';
-  ctx.fillStyle = "red";
-  ctx.textBaseline = "top";
-  ctx.textAlign = "center";
-  ctx.fillText('Merry Jul', config.maxX/2, 100);
+function initText() {
+  config.ctx.font = "bold 180px serif";
+  config.ctx.fillStyle = "#964219";
+  config.ctx.textBaseline = "top";
+  config.ctx.textAlign = "center";
+  config.ctx.fillText("DECEMBER SNOW", config.maxX / 2, 280);
+}
 
-  // analyze the image
-  let myImageData = ctx.getImageData(0, 0, config.maxX, config.maxY);
-
-
+function initPlatforms() {
+  let canvasPixels = config.ctx.getImageData(0, 0, config.maxX, config.maxY);
 
   // loop throug every x value
-  for( let x=0; x < myImageData.width; x++ ) {
+  for (let x = 0; x < canvasPixels.width; x++) {
     let platforms = [];
     allPlatforms[x] = platforms;
 
-//    letterTops[x] = config.maxY;
     let inAPlatform = false;
     // loop through y value on this X
-    for( let y=0; y < myImageData.height; y++ ) {
+    for (let y = 0; y < canvasPixels.height; y++) {
+      let index = 4 * (y * canvasPixels.width + x);
 
-      let index = 4*(y*myImageData.width+x);
+      let r = canvasPixels.data[index];
+      let g = canvasPixels.data[index + 1];
+      let b = canvasPixels.data[index + 2];
+      let a = canvasPixels.data[index + 3];
 
-      let r= myImageData.data[index];
-      let g= myImageData.data[index+1];
-      let b= myImageData.data[index+2];
-      let a= myImageData.data[index+3];
-
-      if( !inAPlatform && a > 50 ) {
+      if (!inAPlatform && a > 50) {
         // non-transparent pixel at position x,y
 
         // add a new platform!
-        platforms.push( {x:x, base: y, height: 0 } );
-
-//        letterTops[x] = y;
+        platforms.push({ x: x, base: y, height: 0 });
         inAPlatform = true;
-
-      } else if( inAPlatform && a < 10 ) {
+      } else if (inAPlatform && a < 10) {
         // transparent pixel!
+        // no longer in a platform
         inAPlatform = false;
       }
 
-     // console.log("for x,y (%d,%d), a is: %d", x,y,a);
     }
-    // also push the maxY
-    platforms.push( {x:x, base: config.maxY-1, height: 0 } );
-
-
+    // push the new platform to the array of platforms
+    platforms.push({ x: x, base: config.maxY - 1, height: 0 });
   }
+}
 
-  // find neighbouring platforms
-  for( let x=0; x < allPlatforms.length; x++ ) {
+function findNeighbouringPlatforms() {
+  for (let x = 0; x < allPlatforms.length; x++) {
     let platforms = allPlatforms[x];
-    for( let i=0; i <platforms.length; i++ ) {
+    for (let i = 0; i < platforms.length; i++) {
       let platform = platforms[i];
 
       let smallestDistance = Number.MAX_SAFE_INTEGER;
-      let possibleNeighbours = allPlatforms[x+1];
+      let possibleNeighbours = allPlatforms[x + 1];
       let closestNeighbour = null;
-      if( possibleNeighbours ) {
-
-
-        for( let j=0; j < possibleNeighbours.length; j++) {
+      if (possibleNeighbours) {
+        for (let j = 0; j < possibleNeighbours.length; j++) {
           let neighbour = possibleNeighbours[j];
           let dist = Math.abs(platform.base - neighbour.base);
 
           // is smallest possible distance
-          if( dist < smallestDistance ) {
+          if (dist < smallestDistance) {
             smallestDistance = dist;
             closestNeighbour = neighbour;
           }
-
         }
 
-        if( smallestDistance < 10 ) {
+        if (smallestDistance < 10) {
           platform.next = closestNeighbour;
           closestNeighbour.prev = platform;
         }
       }
     }
   }
+}
+
+function init() {
+  // create 1000 snowflakes
+  for (let i = 0; i < 1000; i++) {
+    newSnowFlake();
+  }
+
+  // init the canvas, and get the context
+  initCanvas();
+
+  // draw text
+  initText();
+
+  // analyze the image/text
+  initPlatforms();
+
+  // find neighbouring platforms
+  findNeighbouringPlatforms();
 
   // start moving snowflakes
   animate();
 }
 
 let allPlatforms = [];
-//let letterTops = [];
+
 let last;
 
-
-
-
-
-function animate() {
-  let now = Date.now() /1000;
-  let delta = now - (last || now);
-
- // console.log(delta);
-  for( let i = 0; i < snowflakes.length; i++ ) {
-    let flake = snowflakes[i];
-    flake.show();
-
-//    flakes[i].style.transform ="translate("+xpos[i]+"px, "+ypos[i]+"px)";
-    flake.move(delta);
-  }
-
-  // avoid the spikes
-  for( let x=0; x < allPlatforms.length; x++ ) {
+function avoidSpikes() {
+  for (let x = 0; x < allPlatforms.length; x++) {
     let platforms = allPlatforms[x];
-    for( let i=0; i < platforms.length; i++ ) {
+    for (let i = 0; i < platforms.length; i++) {
       let platform = platforms[i];
 
       let next = platform.next;
       let prev = platform.prev;
 
-      if( platform.height > 2 ) {
-      if(next && platform.base-platform.height+2 < next.base-next.height ) {
-        // move a snowflake from platform to next
-        config.ctx.clearRect(x, platform.base-platform.height,1,1);
-        platform.height--;
+      if (platform.height > 2) {
+        if (
+          next &&
+          platform.base - platform.height + 2 < next.base - next.height
+        ) {
+          // move a snowflake from platform to next
+          config.ctx.clearRect(x, platform.base - platform.height, 1, 1);
+          platform.height--;
 
-        config.ctx.fillRect(x+1, next.base-next.height,1,1);
-        next.height++;
+          config.ctx.fillRect(x + 1, next.base - next.height, 1, 1);
+          next.height++;
+        }
+
+        if (
+          prev &&
+          platform.base - platform.height + 1 < prev.base - prev.height
+        ) {
+          // move a snowflake from platform to prev
+          config.ctx.clearRect(x, platform.base - platform.height, 1, 1);
+          platform.height--;
+
+          config.ctx.fillRect(x - 1, prev.base - prev.height, 1, 1);
+          prev.height++;
+        }
       }
-
-      if(prev && platform.base-platform.height+1 < prev.base-prev.height) {
-        // move a snowflake from platform to prev
-        config.ctx.clearRect(x, platform.base-platform.height,1,1);
-        platform.height--;
-
-        config.ctx.fillRect(x-1, prev.base-prev.height,1,1);
-        prev.height++;
-      }
-
-    }
     }
   }
-//  for( let x= 0; x < landed.length; x++ ) {
-//    let thisheight = landed[x];
-//    let nextheight = landed[x+1];
-//
-//    // if this is to much taller than next, move snowflake to the next
-//    if( thisheight-2 > nextheight ) {
-//      // remove a pixel
-//      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
-//      landed[x]--;
-//
-//      config.ctx.fillRect(x+1, config.maxY-landed[x+1],1,1);
-//      landed[x+1]++;
-//    }
-//
-//    if( x > 0 && thisheight-1 > landed[x-1] ) {
-//      // remove a pixel here
-//      config.ctx.clearRect(x, config.maxY-landed[x],1,1);
-//      landed[x]--;
-//
-//      // add a pixel to the left
-//      config.ctx.fillRect(x-1, config.maxY-landed[x-1],1,1);
-//      landed[x-1]++;
-//
-//    }
-//  }
-  last = now;
+}
 
-  requestAnimationFrame( animate );
+function animate() {
+  requestAnimationFrame(animate);
+
+  let now = Date.now() / 1000;
+  let delta = now - (last || now);
+
+  // go through all the snowflakes
+  for (let i = 0; i < snowflakes.length; i++) {
+    let flake = snowflakes[i];
+    flake.move(delta);
+    flake.show();
+  }
+
+  // avoid the spikes
+  avoidSpikes();
+
+  // remember when we last were called
+  last = now;
 }
 
 init();
-
