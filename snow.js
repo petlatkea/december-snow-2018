@@ -8,6 +8,35 @@ const config = {
   windSpeed: 50
 };
 
+function resized() {
+  console.log("resized");
+
+  let oldx = config.maxX;
+  let oldy = config.maxY;
+
+  config.maxX = document.querySelector("#nightsky").clientWidth;
+  config.maxY = document.querySelector("#nightsky").clientHeight;
+
+  let ratioX = config.maxX / oldx;
+  let ratioY = config.maxY / oldy;
+
+  // move all the snowflakes to new x-positions
+  for (let i = 0; i < snowflakes.length; i++) {
+    let snowflake = snowflakes[i];
+
+    snowflake.xpos = snowflake.xpos * ratioX;
+    snowflake.ypos = snowflake.ypos * ratioY;
+  }
+
+  initCanvas();
+
+  //re-initialize text for new size
+  initText();
+
+  initPlatforms();
+  findNeighbouringPlatforms();
+}
+
 // Prototype SnowFlake
 const SnowFlake = {
   ypos: 0,
@@ -28,7 +57,8 @@ const SnowFlake = {
     this.xpos = Math.random() * config.maxX;
     this.ypos = -10;
 
-    this.speed = Math.random() * (config.maxSpeed - config.minSpeed) + config.minSpeed;
+    this.speed =
+      Math.random() * (config.maxSpeed - config.minSpeed) + config.minSpeed;
     this.size = Math.random();
     this.weight = Math.random();
     this.stopped = false;
@@ -111,14 +141,23 @@ function initCanvas() {
 }
 
 function initText() {
-  config.ctx.font = "bold 180px serif";
+  const text = "December Snow";
+  let fontsize = config.maxX / 10;
+  let width = 0;
+  while (width < config.maxX * 0.9) {
+    config.ctx.font = "bold " + fontsize + "px serif";
+    width = config.ctx.measureText(text).width;
+    fontsize += 5;
+  }
+
   config.ctx.fillStyle = "#964219";
   config.ctx.textBaseline = "top";
   config.ctx.textAlign = "center";
-  config.ctx.fillText("DECEMBER SNOW", config.maxX / 2, 280);
+  config.ctx.fillText(text, config.maxX / 2, 280);
 }
 
 function initPlatforms() {
+  allPlatforms = [];
   let canvasPixels = config.ctx.getImageData(0, 0, config.maxX, config.maxY);
 
   // loop throug every x value
@@ -147,7 +186,6 @@ function initPlatforms() {
         // no longer in a platform
         inAPlatform = false;
       }
-
     }
     // push the new platform to the array of platforms
     platforms.push({ x: x, base: config.maxY - 1, height: 0 });
@@ -204,6 +242,8 @@ function init() {
 
   // start moving snowflakes
   animate();
+
+  window.addEventListener("resize", resized);
 }
 
 let allPlatforms = [];
