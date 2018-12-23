@@ -32,6 +32,7 @@ function resized() {
 
   //re-initialize text for new size
   initText();
+  initTrees();
 
   initPlatforms();
   findNeighbouringPlatforms();
@@ -222,6 +223,24 @@ function findNeighbouringPlatforms() {
   }
 }
 
+function drawTree(id, size, xpos) {
+  let image = document.querySelector("#" +id);
+
+  let newHeight = size * config.maxY;
+  let newWidth = image.width * newHeight / image.height;
+
+  // draw it to the canvas
+  config.ctx.drawImage(image,xpos,config.maxY-newHeight,newWidth,newHeight);
+}
+
+function initTrees() {
+  // find the image
+  drawTree("tree1", .5, 0);
+  drawTree("tree2", .4, config.maxX * .25);
+  drawTree("tree3", .3, config.maxX * .60);
+  drawTree("tree1", .5, config.maxX * .8);
+}
+
 function init() {
   // create 1000 snowflakes
   for (let i = 0; i < 1000; i++) {
@@ -233,6 +252,9 @@ function init() {
 
   // draw text
   initText();
+
+  // draw trees
+  initTrees();
 
   // analyze the image/text
   initPlatforms();
@@ -308,4 +330,4 @@ function animate() {
   last = now;
 }
 
-init();
+window.addEventListener("load", init);
