@@ -224,21 +224,27 @@ function findNeighbouringPlatforms() {
 }
 
 function drawTree(id, size, xpos) {
-  let image = document.querySelector("#" +id);
+  let image = document.querySelector("#" + id);
 
   let newHeight = size * config.maxY;
-  let newWidth = image.width * newHeight / image.height;
+  let newWidth = (image.width * newHeight) / image.height;
 
   // draw it to the canvas
-  config.ctx.drawImage(image,xpos,config.maxY-newHeight,newWidth,newHeight);
+  config.ctx.drawImage(
+    image,
+    xpos,
+    config.maxY - newHeight,
+    newWidth,
+    newHeight
+  );
 }
 
 function initTrees() {
   // find the image
-  drawTree("tree1", .5, 0);
-  drawTree("tree2", .4, config.maxX * .25);
-  drawTree("tree3", .3, config.maxX * .60);
-  drawTree("tree1", .5, config.maxX * .8);
+  drawTree("tree1", 0.5, 0);
+  drawTree("tree2", 0.4, config.maxX * 0.25);
+  drawTree("tree3", 0.3, config.maxX * 0.6);
+  drawTree("tree1", 0.5, config.maxX * 0.8);
 }
 
 function init() {
@@ -247,6 +253,10 @@ function init() {
     newSnowFlake();
   }
 
+  // create 5 stars
+  for (let j = 0; j < 5; j++) {
+    newStar();
+  }
   // init the canvas, and get the context
   initCanvas();
 
@@ -321,6 +331,12 @@ function animate() {
     let flake = snowflakes[i];
     flake.move(delta);
     flake.show();
+  }
+
+  for (let j = 0; j < stars.length; j++) {
+    let star = stars[j];
+    star.move(delta);
+    star.show();
   }
 
   // avoid the spikes

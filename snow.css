@@ -38,3 +38,51 @@ body {
   transform-origin: top left;
 /*  box-shadow: 0px 0px 15px white;*/
 }
+
+.star {
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background-image: url(graphics/star.svg);
+
+  animation-name: twinkle;
+  animation-duration: .7s;
+  animation-iteration-count: 2;
+  animation-timing-function: steps(6);
+  animation-direction: alternate;
+  animation-fill-mode: both;
+}
+
+@keyframes twinkle {
+  from {
+    background-position: -600%;
+  }
+
+  to {
+    background-position: 0%;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
