@@ -154,7 +154,7 @@ function initText() {
   config.ctx.fillStyle = "#964219";
   config.ctx.textBaseline = "top";
   config.ctx.textAlign = "center";
-  config.ctx.fillText(text, config.maxX / 2, 280);
+  config.ctx.fillText(text, config.maxX / 2, config.maxY * .2);
 }
 
 function initPlatforms() {
@@ -333,6 +333,7 @@ function animate() {
     flake.show();
   }
 
+  // go through all the stars - defined in stars.js
   for (let j = 0; j < stars.length; j++) {
     let star = stars[j];
     star.move(delta);

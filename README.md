@@ -1,6 +1,8 @@
 # December Snow
 A Christmas Calendar in 24 episodes about creating a nightsky with falling snowflakes. Done in plain JavaScript with DOM and CSS manipulation.
 
+See the final result at http://petlatkea.dk/2018/snow/
+
 There is a [YouTube playlist](https://www.youtube.com/watch?v=0J8mGe0nk1g&list=PL1FXcxClUqNIXhDvQIy0Y8Srs8Jh1wrYK) documenting the development of the code.
 
 Every tag represents an episode:
@@ -27,7 +29,7 @@ Every tag represents an episode:
 21. Platforms - *Snow landing on top and on serifs of letters*
 22. Spikes on platforms - *Snow stacking on platforms, but with spikes*
 23. Perfect platforms - *Snow landing on platforms without spikes*
-24. .
+24. Final touches - *Clean code with resizing, trees and stars*
 
 
 
