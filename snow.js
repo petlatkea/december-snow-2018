@@ -34,8 +34,149 @@ function resized() {
   initText();
   initTrees();
 
+  // remember oldPlatforms
+  const oldPlatforms = allPlatforms.slice();
+
   initPlatforms();
   findNeighbouringPlatforms();
+
+  // recreate snow from old platforms onto the new
+  recreateSnow(oldPlatforms, ratioX, ratioY);
+  redrawSnow();
+}
+
+function recreateSnow(oldPlatforms, ratioX, ratioY) {
+  for (let x = 0; x < allPlatforms.length; x++) {
+    // find the matching old x
+    let oldX = Math.floor(x / ratioX);
+
+    //console.log("new x %d - old x %d", x, oldX);
+    let platforms = allPlatforms[x];
+    let oPlatforms = oldPlatforms[oldX];
+
+    // loop through all the new platforms
+    for (let i = 0; i < platforms.length; i++) {
+      // for each one, find the closest matching old platform
+      let platform = platforms[i];
+
+      let approxY = platform.base / ratioY;
+      let closest = null;
+      let smallestDist = Number.MAX_SAFE_INTEGER;
+      for (let j = 0; j < oPlatforms.length; j++) {
+        let oPlatform = oPlatforms[j];
+        let dist = Math.abs(approxY - oPlatform.base);
+        if (dist < smallestDist) {
+          smallestDist = dist;
+          closest = oPlatform;
+        }
+      }
+
+      // If there was a closest (don't see how not ... )
+      // add snow to it
+      if (closest) {
+        platform.height += Math.floor(closest.height / ratioY);
+      }
+    }
+  }
+}
+
+function avoidSpikes() {
+  for (let x = 0; x < allPlatforms.length; x++) {
+    let platforms = allPlatforms[x];
+    for (let i = 0; i < platforms.length; i++) {
+      let platform = platforms[i];
+
+      let next = platform.next;
+      let prev = platform.prev;
+
+      if (platform.height > 2) {
+        if (
+          next &&
+          platform.base - platform.height + 2 < next.base - next.height
+        ) {
+          // move a snowflake from platform to next
+          config.ctx.clearRect(x, platform.base - platform.height, 1, 1);
+          platform.height--;
+
+          config.ctx.fillRect(x + 1, next.base - next.height, 1, 1);
+          next.height++;
+        }
+
+        if (
+          prev &&
+          platform.base - platform.height + 1 < prev.base - prev.height
+        ) {
+          // move a snowflake from platform to prev
+          config.ctx.clearRect(x, platform.base - platform.height, 1, 1);
+          platform.height--;
+
+          config.ctx.fillRect(x - 1, prev.base - prev.height, 1, 1);
+          prev.height++;
+        }
+      }
+    }
+  }
+}
+
+function findNeighbouringPlatforms() {
+  for (let x = 0; x < allPlatforms.length; x++) {
+    let platforms = allPlatforms[x];
+    for (let i = 0; i < platforms.length; i++) {
+      let platform = platforms[i];
+
+      let smallestDistance = Number.MAX_SAFE_INTEGER;
+      let possibleNeighbours = allPlatforms[x + 1];
+      let closestNeighbour = null;
+      if (possibleNeighbours) {
+        for (let j = 0; j < possibleNeighbours.length; j++) {
+          let neighbour = possibleNeighbours[j];
+          let dist = Math.abs(platform.base - neighbour.base);
+
+          // is smallest possible distance
+          if (dist < smallestDistance) {
+            smallestDistance = dist;
+            closestNeighbour = neighbour;
+          }
+        }
+
+        if (smallestDistance < 10) {
+          platform.next = closestNeighbour;
+          closestNeighbour.prev = platform;
+        }
+      }
+    }
+  }
+}
+
+// redraws all the snowflakes on every platform
+function redrawSnow() {
+  config.ctx.fillStyle = "white";
+
+  for (let x = 0; x < allPlatforms.length; x++) {
+    const platforms = allPlatforms[x];
+    for (let i = 0; i < platforms.length; i++) {
+      const platform = platforms[i];
+
+      config.ctx.fillRect(
+        x,
+        platform.base - platform.height,
+        1,
+        platform.height
+      );
+    }
+  }
+}
+
+// drops 5-10 snowflakes on every platform
+function dropRandomSnow(minimum = 5) {
+  for (let x = 0; x < allPlatforms.length; x++) {
+    const platforms = allPlatforms[x];
+    for (let i = 0; i < platforms.length; i++) {
+      const platform = platforms[i];
+
+      platform.height += Math.floor(Math.random() * 5) + minimum;
+    }
+  }
 }
 
 // Prototype SnowFlake
@@ -154,7 +295,7 @@ function initText() {
   config.ctx.fillStyle = "#964219";
   config.ctx.textBaseline = "top";
   config.ctx.textAlign = "center";
-  config.ctx.fillText(text, config.maxX / 2, config.maxY * .2);
+  config.ctx.fillText(text, config.maxX / 2, config.maxY * 0.2);
 }
 
 function initPlatforms() {
@@ -193,54 +334,25 @@ function initPlatforms() {
   }
 }
 
-function findNeighbouringPlatforms() {
-  for (let x = 0; x < allPlatforms.length; x++) {
-    let platforms = allPlatforms[x];
-    for (let i = 0; i < platforms.length; i++) {
-      let platform = platforms[i];
-
-      let smallestDistance = Number.MAX_SAFE_INTEGER;
-      let possibleNeighbours = allPlatforms[x + 1];
-      let closestNeighbour = null;
-      if (possibleNeighbours) {
-        for (let j = 0; j < possibleNeighbours.length; j++) {
-          let neighbour = possibleNeighbours[j];
-          let dist = Math.abs(platform.base - neighbour.base);
-
-          // is smallest possible distance
-          if (dist < smallestDistance) {
-            smallestDistance = dist;
-            closestNeighbour = neighbour;
-          }
-        }
-
-        if (smallestDistance < 10) {
-          platform.next = closestNeighbour;
-          closestNeighbour.prev = platform;
-        }
-      }
-    }
-  }
-}
-
-function drawTree(id, size, xpos) {
-  let image = document.querySelector("#" + id);
-
-  let newHeight = size * config.maxY;
-  let newWidth = (image.width * newHeight) / image.height;
-
-  // draw it to the canvas
-  config.ctx.drawImage(
-    image,
-    xpos,
-    config.maxY - newHeight,
-    newWidth,
-    newHeight
-  );
-}
-
 function initTrees() {
-  // find the image
+  // draw a single tree at the bottom of the scene
+  function drawTree(id, size, xpos) {
+    let image = document.querySelector("#" + id);
+
+    let newHeight = size * config.maxY;
+    let newWidth = (image.width * newHeight) / image.height;
+
+    // draw it to the canvas
+    config.ctx.drawImage(
+      image,
+      xpos,
+      config.maxY - newHeight,
+      newWidth,
+      newHeight
+    );
+  }
+
+  // draw "random" trees on the scene - be artistic!
   drawTree("tree1", 0.5, 0);
   drawTree("tree2", 0.4, config.maxX * 0.25);
   drawTree("tree3", 0.3, config.maxX * 0.6);
@@ -281,44 +393,6 @@ function init() {
 let allPlatforms = [];
 
 let last;
-
-function avoidSpikes() {
-  for (let x = 0; x < allPlatforms.length; x++) {
-    let platforms = allPlatforms[x];
-    for (let i = 0; i < platforms.length; i++) {
-      let platform = platforms[i];
-
-      let next = platform.next;
-      let prev = platform.prev;
-
-      if (platform.height > 2) {
-        if (
-          next &&
-          platform.base - platform.height + 2 < next.base - next.height
-        ) {
-          // move a snowflake from platform to next
-          config.ctx.clearRect(x, platform.base - platform.height, 1, 1);
-          platform.height--;
-
-          config.ctx.fillRect(x + 1, next.base - next.height, 1, 1);
-          next.height++;
-        }
-
-        if (
-          prev &&
-          platform.base - platform.height + 1 < prev.base - prev.height
-        ) {
-          // move a snowflake from platform to prev
-          config.ctx.clearRect(x, platform.base - platform.height, 1, 1);
-          platform.height--;
-
-          config.ctx.fillRect(x - 1, prev.base - prev.height, 1, 1);
-          prev.height++;
-        }
-      }
-    }
-  }
-}
 
 function animate() {
   requestAnimationFrame(animate);
