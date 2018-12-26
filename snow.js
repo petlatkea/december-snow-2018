@@ -8,6 +8,9 @@ const config = {
   windSpeed: 50
 };
 
+/** Called on every resize - calculates the X and Y ratio, moves the
+    snowflakes, re-inits the canvas, calculates new platforms, and
+    moves the landed snow to the new platforms */
 function resized() {
   console.log("resized");
 
@@ -45,6 +48,8 @@ function resized() {
   redrawSnow();
 }
 
+/** Re-creates the snow from the oldPlatforms on the new platforms -
+    as precisely as possible ... */
 function recreateSnow(oldPlatforms, ratioX, ratioY) {
   for (let x = 0; x < allPlatforms.length; x++) {
     // find the matching old x
@@ -80,6 +85,8 @@ function recreateSnow(oldPlatforms, ratioX, ratioY) {
   }
 }
 
+/** avoids spikes on every animation, by moving landed snowflakes to
+    either right or left neighbour, if possible. */
 function avoidSpikes() {
   for (let x = 0; x < allPlatforms.length; x++) {
     let platforms = allPlatforms[x];
@@ -118,6 +125,7 @@ function avoidSpikes() {
   }
 }
 
+/** analyze the platforms to find the neighbours used by avoidSpikes */
 function findNeighbouringPlatforms() {
   for (let x = 0; x < allPlatforms.length; x++) {
     let platforms = allPlatforms[x];
@@ -148,7 +156,7 @@ function findNeighbouringPlatforms() {
   }
 }
 
-// redraws all the snowflakes on every platform
+/** redraws all the snowflakes on every platform */
 function redrawSnow() {
   config.ctx.fillStyle = "white";
 
@@ -167,7 +175,7 @@ function redrawSnow() {
   }
 }
 
-// drops 5-10 snowflakes on every platform
+/** drops 5-10 snowflakes on every platform - not used, but nice for testing */
 function dropRandomSnow(minimum = 5) {
   for (let x = 0; x < allPlatforms.length; x++) {
     const platforms = allPlatforms[x];
@@ -179,7 +187,7 @@ function dropRandomSnow(minimum = 5) {
   }
 }
 
-// Prototype SnowFlake
+/** Prototype SnowFlake */
 const SnowFlake = {
   ypos: 0,
   xpos: 0,
@@ -253,6 +261,7 @@ const SnowFlake = {
 // array of all the snowflakes on the screen
 const snowflakes = [];
 
+/** create a new snowflake, and adds it to the array - kind of a constructor */
 function newSnowFlake() {
   const flake = Object.create(SnowFlake);
   flake.create();
@@ -261,6 +270,7 @@ function newSnowFlake() {
   snowflakes.push(flake);
 }
 
+/** land a snowflake on a platform */
 function landSnowflake(flake, platform) {
   let x = platform.x;
   let y = platform.base - platform.height;
@@ -273,6 +283,7 @@ function landSnowflake(flake, platform) {
   ctx.fillRect(x, y, 1, 1);
 }
 
+/** init the canvas for drawing landed snow, text and trees */
 function initCanvas() {
   const canvas = document.getElementById("canvas");
   canvas.width = config.maxX;
@@ -282,10 +293,12 @@ function initCanvas() {
   config.ctx = canvas.getContext("2d");
 }
 
+/** init the text on the canvas - adapts to the size of the screen */
 function initText() {
   const text = "December Snow";
   let fontsize = config.maxX / 10;
   let width = 0;
+  // try to get the width of the text to be 90% of the width of the screen
   while (width < config.maxX * 0.9) {
     config.ctx.font = "bold " + fontsize + "px serif";
     width = config.ctx.measureText(text).width;
@@ -298,6 +311,7 @@ function initText() {
   config.ctx.fillText(text, config.maxX / 2, config.maxY * 0.2);
 }
 
+/** analyse the canvas, and create platforms for the snow to land on */
 function initPlatforms() {
   allPlatforms = [];
   let canvasPixels = config.ctx.getImageData(0, 0, config.maxX, config.maxY);
@@ -334,6 +348,7 @@ function initPlatforms() {
   }
 }
 
+/** draw trees on the canvas - that the snow can also land on */
 function initTrees() {
   // draw a single tree at the bottom of the scene
   function drawTree(id, size, xpos) {
@@ -359,6 +374,7 @@ function initTrees() {
   drawTree("tree1", 0.5, config.maxX * 0.8);
 }
 
+/** initialize the entire snowyscene with snowflakes, trees, and stars */
 function init() {
   // create 1000 snowflakes
   for (let i = 0; i < 1000; i++) {
